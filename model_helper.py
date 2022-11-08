@@ -2,6 +2,9 @@ def test(str):
     print(str)
 
 
+# stock =stock ticker
+# date = max, 1y..etc
+# Return dataframe with daily return
 def get_data(stock, date):
     import pandas as pd
     import yfinance as yf  # Import yahoo finance module
@@ -21,6 +24,9 @@ def get_data(stock, date):
     return df
 
 
+# stock = array of stock tickers
+# date = max, 1y..etc
+# Return dataframe with daily return for all stock tickers
 def get_data_for_stocks(stocks, date):
     import pandas as pd
     results = []
@@ -37,7 +43,7 @@ def get_data_for_stocks(stocks, date):
 
     return results
 
-
+# Not generic
 def get_custom(others, date):
     import pandas as pd
     dg = pd.read_excel('DGS3MO.xls')
@@ -49,6 +55,9 @@ def get_custom(others, date):
     return results
 
 
+# Input = Map of stock and Beta
+# Returns expected return 
+# expected return = risk_free_return + beta*(market_return - risk_free_return)
 def capm_modelMap(mapOfStockBeta, market,riskFreeRate):
     risk_free_return = riskFreeRate
     market_return = mapOfStockBeta[market]
@@ -61,6 +70,11 @@ def capm_modelMap(mapOfStockBeta, market,riskFreeRate):
     exp_return[market] = mapOfStockBeta[market]
     return exp_return
 
+
+# stock = array of stock tickers
+# date = max, 1y..etc
+# Return Map with stock: expected return
+# expected return = risk_free_return + beta*(market_return - risk_free_return)
 def capm_model(stocks, market,riskFreeRate, date):
     mapOfStockBeta  = compute_beta(stocks, market, date)
     risk_free_return = riskFreeRate
