@@ -60,15 +60,15 @@ def get_custom(others, date):
 # expected return = risk_free_return + beta*(market_return - risk_free_return)
 def capm_modelMap(mapOfStockBeta, market,riskFreeRate):
     risk_free_return = riskFreeRate
-    market_return = mapOfStockBeta[market]
+    market_return = mapOfStockBeta[market].annual_return
     exp_return = {}
     for stock in mapOfStockBeta:
-        beta  = mapOfStockBeta[stock]
+        beta  = mapOfStockBeta[stock].beta
         expected_return = risk_free_return + beta*(market_return - risk_free_return)
-        exp_return[stock] = expected_return
+        mapOfStockBeta[stock].exp_return = expected_return
     
-    exp_return[market] = mapOfStockBeta[market]
-    return exp_return
+    mapOfStockBeta[market].exp_return = mapOfStockBeta[market].annual_return
+    return mapOfStockBeta
 
 
 # stock = array of stock tickers
@@ -78,22 +78,34 @@ def capm_modelMap(mapOfStockBeta, market,riskFreeRate):
 def capm_model(stocks, market,riskFreeRate, date):
     mapOfStockBeta  = compute_beta(stocks, market, date)
     risk_free_return = riskFreeRate
-    market_return = mapOfStockBeta[market]
+    market_return = mapOfStockBeta[market].annual_return
     exp_return = capm_modelMap(mapOfStockBeta, market, riskFreeRate)
     return exp_return
 
+# stock = array of stock tickers
+# date = max, 1y..etc
+# return map of stock and beta
 def compute_beta(stocks, market, date):
     import pandas as pd
+    from stock import Stock
     hist  = get_data_for_stocks(stocks, date)
     hist.to_excel("Beta.xlsx", index = False)
     results = pd.read_excel('Beta.xlsx')
     mapOfStockBeta = {}
     #app_beta = data['SPY_daily_return'].cov(data['AAPL_daily_return'])/data['SPY_daily_return'].var()
-    for stock in stocks:
-        app_beta = results[market + '_daily_return'].cov(results[stock+'_daily_return'])/results[market+'_daily_return'].var()
-        mapOfStockBeta[stock] = app_beta
-        print(stock + ' ' +  str(app_beta))
+    for stock1 in stocks:
+        myStock = Stock(stock1)
+        app_beta = results[market + '_daily_return'].cov(results[stock1+'_daily_return'])/results[market+'_daily_return'].var()
+        myStock.beta = app_beta
+        myStock.cov = results[market + '_daily_return'].cov(results[stock1+'_daily_return'])
+        myStock.corr = results[market + '_daily_return'].corr(results[stock1+'_daily_return'])
+        myStock.annual_return = results[stock1+'_daily_return'].mean()*252
+        myStock.std = results[stock1+'_daily_return'].std()
+        myStock.var = results[stock1+'_daily_return'].var()
+        mapOfStockBeta[stock1] = myStock
+        print(stock1 + ' ' +  str(app_beta))
     
-    mapOfStockBeta[market] = results[market + '_daily_return'].mean()*252 #just put return of market
+    mapOfStockBeta[market].beta = results[market + '_daily_return'].mean()*252 #just put return of market
+    mapOfStockBeta[market].beta = results[market + '_daily_return'].mean()*252 #just put return of market
     return mapOfStockBeta
             
