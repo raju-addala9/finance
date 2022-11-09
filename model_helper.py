@@ -108,4 +108,8 @@ def compute_beta(stocks, market, date):
     mapOfStockBeta[market].beta = results[market + '_daily_return'].mean()*252 #just put return of market
     mapOfStockBeta[market].beta = results[market + '_daily_return'].mean()*252 #just put return of market
     return mapOfStockBeta
-            
+           
+def get_as_dataframe(stocks):
+    import pandas as pd
+    p  = pd.DataFrame([vars(stocks[s]) for s in stocks])
+    return p
