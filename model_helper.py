@@ -63,9 +63,10 @@ def capm_modelMap(mapOfStockBeta, market,riskFreeRate):
     market_return = mapOfStockBeta[market].annual_return
     exp_return = {}
     for stock in mapOfStockBeta:
-        beta  = mapOfStockBeta[stock].beta
-        expected_return = risk_free_return + beta*(market_return - risk_free_return)
-        mapOfStockBeta[stock].exp_return = expected_return
+        if stock != market:
+            beta  = mapOfStockBeta[stock].beta
+            expected_return = risk_free_return + beta*(market_return - risk_free_return)
+            mapOfStockBeta[stock].exp_return = expected_return
     
     mapOfStockBeta[market].exp_return = mapOfStockBeta[market].annual_return
     return mapOfStockBeta
@@ -102,13 +103,16 @@ def compute_beta(stocks, market, date):
         myStock.annual_return = results[stock1+'_daily_return'].mean()*252
         myStock.std = results[stock1+'_daily_return'].std()
         myStock.var = results[stock1+'_daily_return'].var()
-        myStock.systematic = (myStock.beta*myStock.beta)*results[market+'_daily_return'].var()
-        myStock.idiosyncratic  = myStock.var - myStock.systematic
+        if stock1 == 'SPY':
+            myStock.systematic = myStock.var
+            myStock.idiosyncratic  = 0
+            myStock.beta = 1
+        else:
+            myStock.systematic = (myStock.beta*myStock.beta)*results[market+'_daily_return'].var()
+            myStock.idiosyncratic  = myStock.var - myStock.systematic
+        
         mapOfStockBeta[stock1] = myStock
         print(stock1 + ' ' +  str(app_beta))
-    
-    mapOfStockBeta[market].beta = results[market + '_daily_return'].mean()*252 #just put return of market
-    mapOfStockBeta[market].beta = results[market + '_daily_return'].mean()*252 #just put return of market
     return mapOfStockBeta
            
 def get_as_dataframe(stocks):
