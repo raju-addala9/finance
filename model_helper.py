@@ -102,6 +102,8 @@ def compute_beta(stocks, market, date):
         myStock.annual_return = results[stock1+'_daily_return'].mean()*252
         myStock.std = results[stock1+'_daily_return'].std()
         myStock.var = results[stock1+'_daily_return'].var()
+        myStock.systematic = (myStock.beta*myStock.beta)*results[market+'_daily_return'].var()
+        myStock.idiosyncratic  = myStock.var - myStock.systematic
         mapOfStockBeta[stock1] = myStock
         print(stock1 + ' ' +  str(app_beta))
     
