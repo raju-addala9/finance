@@ -119,3 +119,16 @@ def get_as_dataframe(stocks):
     import pandas as pd
     p  = pd.DataFrame([vars(stocks[s]) for s in stocks])
     return p
+
+def fix_missing_values(stocks):
+    stocks.dropna() 
+    
+def check_missing_values(stocks):
+    stocks.dropna() 
+    
+    
+def regression(stocks, market):
+    from scipy import stats
+    import pandas as pd
+    for stock in stocks:
+        beta, alpha, r_value, p_value, std_err =  stats.linregress(stocks[market + '_daily_return'], stocks[stock+'_daily_return'])
