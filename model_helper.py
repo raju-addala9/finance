@@ -120,11 +120,13 @@ def get_as_dataframe(stocks):
     p  = pd.DataFrame([vars(stocks[s]) for s in stocks])
     return p
 
+# drops all missing values
 def fix_missing_values(stocks):
+    #stocks.fillna(0)
     stocks.dropna() 
     
 def check_missing_values(stocks):
-    stocks.dropna() 
+    stocks.isnull().sum() 
     
     
 def regression(stocks, market):
